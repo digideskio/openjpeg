@@ -182,6 +182,7 @@ export OPJ_BUILDNAME=${OPJ_BUILDNAME}
 export OPJ_SOURCE_DIR=$(opjpath -m ${OPJ_SOURCE_DIR})
 export OPJ_BINARY_DIR=$(opjpath -m ${PWD}/build)
 export OPJ_BUILD_CONFIGURATION=${OPJ_CI_BUILD_CONFIGURATION}
+export OPJ_BUILD_SHARED_LIBS=${OPJ_CI_BUILD_SHARED_LIBS}
 export OPJ_DO_SUBMIT=${OPJ_DO_SUBMIT}
 
 ctest -S ${OPJ_SOURCE_DIR}/tools/ctest_scripts/travis-ci.cmake -V || true
