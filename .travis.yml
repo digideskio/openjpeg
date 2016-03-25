@@ -40,10 +40,5 @@ install:
 script:
   - ./tools/travis-ci/run.sh
   - ./tools/travis-ci/abi-check.sh
+  - ./tools/travis-ci/deploy.sh
 
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: ./tools/travis-ci/deploy.sh
-  on:
-    branch: snap-travis
