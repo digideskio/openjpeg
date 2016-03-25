@@ -176,6 +176,9 @@ set -x
 # travis-ci doesn't dump cmake version in system info, let's print it 
 cmake --version
 
+# Ensure cpack is installed and dump its version
+cpack --version
+
 export TRAVIS_OS_NAME="${TRAVIS_OS_NAME}"
 export OPJ_SITE="${OPJ_SITE}"
 export OPJ_BUILDNAME="${OPJ_BUILDNAME}"
