@@ -35,19 +35,6 @@ matrix:
             - binutils-mingw-w64-i686
             - gcc-mingw-w64-i686
             - gcc-mingw-w64      
-    - os: linux
-      compiler: gcc-4.8
-      env: OPJ_CI_ABI_CHECK=1
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-4.8
-            - libelf-dev
-            - elfutils
-            - texinfo
-            - exuberant-ctags
 
 install:
   - ./tools/travis-ci/install.sh
