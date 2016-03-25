@@ -176,14 +176,14 @@ set -x
 # travis-ci doesn't dump cmake version in system info, let's print it 
 cmake --version
 
-export TRAVIS_OS_NAME=${TRAVIS_OS_NAME}
-export OPJ_SITE=${OPJ_SITE}
-export OPJ_BUILDNAME=${OPJ_BUILDNAME}
-export OPJ_SOURCE_DIR=$(opjpath -m ${OPJ_SOURCE_DIR})
-export OPJ_BINARY_DIR=$(opjpath -m ${PWD}/build)
-export OPJ_BUILD_CONFIGURATION=${OPJ_CI_BUILD_CONFIGURATION}
-export OPJ_BUILD_SHARED_LIBS=${OPJ_CI_BUILD_SHARED_LIBS}
-export OPJ_DO_SUBMIT=${OPJ_DO_SUBMIT}
+export TRAVIS_OS_NAME="${TRAVIS_OS_NAME}"
+export OPJ_SITE="${OPJ_SITE}"
+export OPJ_BUILDNAME="${OPJ_BUILDNAME}"
+export OPJ_SOURCE_DIR="$(opjpath -m ${OPJ_SOURCE_DIR})"
+export OPJ_BINARY_DIR="$(opjpath -m ${PWD}/build)"
+export OPJ_BUILD_CONFIGURATION="${OPJ_CI_BUILD_CONFIGURATION}"
+export OPJ_BUILD_SHARED_LIBS="${OPJ_CI_BUILD_SHARED_LIBS:-}"
+export OPJ_DO_SUBMIT="${OPJ_DO_SUBMIT}"
 
 ctest -S ${OPJ_SOURCE_DIR}/tools/ctest_scripts/travis-ci.cmake -V || true
 # ctest will exit with various error codes depending on version.
