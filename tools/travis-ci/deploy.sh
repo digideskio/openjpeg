@@ -8,4 +8,7 @@ openssl aes-256-cbc -K $encrypted_02a35d19a032_key -iv $encrypted_02a35d19a032_i
 eval "$(ssh-agent -s)"
 chmod 600 ~/.ssh/id_rsa
 ssh-add ~/.ssh/id_rsa
-scp build/openjpeg-*.zip ${DEPLOY_TARGET}
+
+ssh-keyscan -H step.esa.int >> ~/.ssh/known_hosts
+
+scp  build/openjpeg-*.zip ${DEPLOY_TARGET}
