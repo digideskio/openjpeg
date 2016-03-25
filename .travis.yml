@@ -1,8 +1,9 @@
 language: c
 
 env:
-  # The location where the deploy script sends artifacts. This defines the DEPLOY_TARGET env var
-  secure: "iMr7ip0QIrzJVJrQLNDXjoU+e1eKy+SSbRWWoAX5O2y0K7Nmm8hLyu8yUuHE3DiT8g0hVyCHOHkKuA1+Q1fXaT3YSpL4Zg/fsGGMObl82/wdv9jcheOA/VtsUQ1vYYv7VeRfiWPbVhm4IZme+KhKNzrHz92GzuPNraJxwf8ehmg8nZOW8eYySCnfK3LGSkg3CCNXUWOfxhQ6xU2WnYuZvr3v9BleqIrjRabghIm6xqvPpO/72liAGfOu9GV7vy6JRNVdPFbbZqmMsEgFkts/k5eirlXH+/+QujwvHOK7x/J9zMac/GhiuTbKVb8ghDs9FIyvkJU8c8AVoekqz+rqeIl37IlcanDGKNq6j8O/0hpirh/AC9cwcKpBzFShzWM3SelyV6QHP/KdRkxaAJLhp4KFOFGWkHunezzKtP5tZq6bjxfpsGizEPvUdZaXO6d1LjqoPxh1Z0QKdXESxGl+cMP/ZfzZbzFTmJ+BDrNINdOWmj4jDJCfZ249oNb6TVLrXaSD08nU4KHpNjGvBGQB5Rqj3+xi5yJWKKL2u2+7PC9JwUgTJQ31qF5qm6ceN5862EBJ4zftjjq+rRoeFPevggbPtZa0k4utp0V3FealcvQ4RkHHQXveeIZf0r/0uSmPrXzGmY4baMSz+rB2FIq+m9T7sz+S0kizHhOKB+BlxhA="
+  global:
+    # The location where the deploy script sends artifacts. This defines the DEPLOY_TARGET env var
+    - secure: "iMr7ip0QIrzJVJrQLNDXjoU+e1eKy+SSbRWWoAX5O2y0K7Nmm8hLyu8yUuHE3DiT8g0hVyCHOHkKuA1+Q1fXaT3YSpL4Zg/fsGGMObl82/wdv9jcheOA/VtsUQ1vYYv7VeRfiWPbVhm4IZme+KhKNzrHz92GzuPNraJxwf8ehmg8nZOW8eYySCnfK3LGSkg3CCNXUWOfxhQ6xU2WnYuZvr3v9BleqIrjRabghIm6xqvPpO/72liAGfOu9GV7vy6JRNVdPFbbZqmMsEgFkts/k5eirlXH+/+QujwvHOK7x/J9zMac/GhiuTbKVb8ghDs9FIyvkJU8c8AVoekqz+rqeIl37IlcanDGKNq6j8O/0hpirh/AC9cwcKpBzFShzWM3SelyV6QHP/KdRkxaAJLhp4KFOFGWkHunezzKtP5tZq6bjxfpsGizEPvUdZaXO6d1LjqoPxh1Z0QKdXESxGl+cMP/ZfzZbzFTmJ+BDrNINdOWmj4jDJCfZ249oNb6TVLrXaSD08nU4KHpNjGvBGQB5Rqj3+xi5yJWKKL2u2+7PC9JwUgTJQ31qF5qm6ceN5862EBJ4zftjjq+rRoeFPevggbPtZa0k4utp0V3FealcvQ4RkHHQXveeIZf0r/0uSmPrXzGmY4baMSz+rB2FIq+m9T7sz+S0kizHhOKB+BlxhA="
 
 matrix:
   include:
@@ -42,6 +43,7 @@ script:
 
 deploy:
   provider: script
+  skip_cleanup: true
   script: ./tools/travis-ci/deploy.sh
   on:
     branch: snap
