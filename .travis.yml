@@ -46,4 +46,4 @@ deploy:
   skip_cleanup: true
   script: ./tools/travis-ci/deploy.sh
   on:
-    branch: snap
+    branch: snap-travis
