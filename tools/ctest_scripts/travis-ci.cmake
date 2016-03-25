@@ -158,3 +158,5 @@ if ("$ENV{OPJ_DO_SUBMIT}" STREQUAL "1")
 endif()
 # Do not clean, we'll parse the log for known failure
 #ctest_empty_binary_directory( "${CTEST_BINARY_DIRECTORY}" )
+
+execute_process(COMMAND cpack -G ZIP -V)
