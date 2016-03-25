@@ -188,6 +188,10 @@ export OPJ_DO_SUBMIT="${OPJ_DO_SUBMIT}"
 ctest -S ${OPJ_SOURCE_DIR}/tools/ctest_scripts/travis-ci.cmake -V || true
 # ctest will exit with various error codes depending on version.
 # ignore ctest exit code & parse this ourselves
+
+# Make a zip package
+cpack -G ZIP -V
+
 set +x
 
 # let's parse configure/build/tests for failure
