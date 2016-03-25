@@ -187,6 +187,7 @@ export OPJ_BINARY_DIR="$(opjpath -m ${PWD}/build)"
 export OPJ_BUILD_CONFIGURATION="${OPJ_CI_BUILD_CONFIGURATION}"
 export OPJ_BUILD_SHARED_LIBS="${OPJ_CI_BUILD_SHARED_LIBS:-}"
 export OPJ_DO_SUBMIT="${OPJ_DO_SUBMIT}"
+export OPJ_CPACK_SYSTEM_NAME="${OPJ_CI_CPACK_SYSTEM_NAME:-}"
 
 ctest -S ${OPJ_SOURCE_DIR}/tools/ctest_scripts/travis-ci.cmake -V || true
 # ctest will exit with various error codes depending on version.

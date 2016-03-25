@@ -123,6 +123,17 @@ JPYLYZER_EXECUTABLE=$ENV{PWD}/jpylyzer/jpylyzer.${JPYLYZER_EXT}
 
 " )
 
+# Override CPACK_SYSTEM_NAME if provided from environment
+if (NOT "$ENV{OPJ_CPACK_SYSTEM_NAME}" STREQUAL "")
+set( CACHE_CONTENTS "
+${CACHE_CONTENTS}
+
+CPACK_SYSTEM_NAME:STRING=$ENV{OPJ_CPACK_SYSTEM_NAME}
+"
+)
+endif()
+
+
 #---------------------
 #1. openjpeg specific: 
 set( CTEST_PROJECT_NAME	"OPENJPEG" )
