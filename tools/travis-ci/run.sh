@@ -216,7 +216,7 @@ export OPJ_BUILD_SHARED_LIBS="${OPJ_CI_BUILD_SHARED_LIBS:-}"
 export OPJ_DO_SUBMIT="${OPJ_DO_SUBMIT}"
 export OPJ_CPACK_SYSTEM_NAME="${OPJ_CI_CPACK_SYSTEM_NAME:-}"
 
-ctest -S ${OPJ_SOURCE_DIR}/tools/ctest_scripts/travis-ci.cmake -V || true
+ctest -S ${OPJ_SOURCE_DIR}/tools/ctest_scripts/travis-ci.cmake -VV || true
 # ctest will exit with various error codes depending on version.
 # ignore ctest exit code & parse this ourselves
 
