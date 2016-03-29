@@ -2,10 +2,16 @@
 
 # This script executes the script step when running under travis-ci
 
-if [ "${OPJ_CI_DOCKER:-}" == "true" && "${OPJ_CI_INSIDE_DOCKER:-}" != "true" ]; then
+# Set-up some bash options
+set -o nounset   ## set -u : exit the script if you try to use an uninitialised variable
+set -o errexit   ## set -e : exit the script if any statement returns a non-true return value
+set -o pipefail  ## Fail on error in pipe
+
+if [ "${OPJ_CI_DOCKER:-}" == "true" ] && [ "${OPJ_CI_INSIDE_DOCKER:-}" != "true" ]; then
     # run this script inside the docker container
     # mount home from the host to the same place on the container
     docker run --rm=true -e OPJ_CI_INSIDE_DOCKER=true -v $HOME:$HOME:rw jmk/centosbuilder /bin/bash -c "cd $(pwd); run.sh"
+    exit $?
 fi
 
 #if cygwin, check path
@@ -16,11 +22,6 @@ esac
 
 # Hack for appveyor to get GNU find in path before windows one.
 export PATH=$(dirname ${BASH}):$PATH
-
-# Set-up some bash options
-set -o nounset   ## set -u : exit the script if you try to use an uninitialised variable
-set -o errexit   ## set -e : exit the script if any statement returns a non-true return value
-set -o pipefail  ## Fail on error in pipe
 
 function opjpath ()
 {
