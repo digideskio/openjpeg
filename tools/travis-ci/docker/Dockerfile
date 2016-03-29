@@ -4,6 +4,6 @@ MAINTAINER jmk "julien.malik@paraiso.me"
 ENV LC_ALL C
 ENV TERM xterm
 
-RUN yum -y update; yum -y install gcc make libtool elfutils which git lsb-release; yum clean all
+RUN yum -y update; yum -y install gcc make libtool elfutils which git redhat-lsb; yum clean all
 
 # CMD ["/bin/bash"]
