@@ -114,3 +114,13 @@ if [ "${OPJ_CI_SKIP_TESTS:-}" != "1" ]; then
 		fi
 	fi
 fi
+
+
+if [ "${OPJ_CI_DOCKER:-}" == "true" ]; then
+  # https://github.com/weldpua2008/ansible-apache/blob/fe6e77d5d389ed6005a7b90e0b15a8752609cbdc/.travis.yml
+  docker build --rm -t jmk/centosbuilder docker/
+
+  echo USER=$USER
+  echo HOME=$HOME
+  echo TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR
+fi

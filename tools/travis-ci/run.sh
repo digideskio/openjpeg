@@ -2,6 +2,12 @@
 
 # This script executes the script step when running under travis-ci
 
+if [ "${OPJ_CI_DOCKER:-}" == "true" && "${OPJ_CI_INSIDE_DOCKER:-}" != "true" ]; then
+    # run this script inside the docker container
+    # mount home from the host to the same place on the container
+    docker run --rm=true -e OPJ_CI_INSIDE_DOCKER=true -v $HOME:$HOME:rw jmk/centosbuilder /bin/bash -c "cd $(pwd); run.sh"
+fi
+
 #if cygwin, check path
 case ${MACHTYPE} in
 	*cygwin*) OPJ_CI_IS_CYGWIN=1;;
