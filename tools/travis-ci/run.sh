@@ -23,6 +23,8 @@ if [ "${OPJ_CI_DOCKER:-}" == "true" ]; then
     for envvar in TRAVIS_BRANCH TRAVIS_BUILD_DIR TRAVIS_BUILD_ID TRAVIS_BUILD_NUMBER TRAVIS_COMMIT TRAVIS_COMMIT_RANGE TRAVIS_JOB_ID TRAVIS_JOB_NUMBER TRAVIS_OS_NAME TRAVIS_PULL_REQUEST TRAVIS_REPO_SLUG TRAVIS_SECURE_ENV_VARS TRAVIS_TAG ; do
         echo $envvar=${!envvar} >> dockerenv
     done
+
+    echo CC=/usr/bin/cc >> dockerenv
     
     echo "The following env.var. are forwarded to docker :"
     cat dockerenv
