@@ -3,6 +3,7 @@
 # This script executes the script step when running under travis-ci
 
 # Set-up some bash options
+set -o nounset   ## set -u : exit the script if you try to use an uninitialised variable
 set -o errexit   ## set -e : exit the script if any statement returns a non-true return value
 set -o pipefail  ## Fail on error in pipe
 
@@ -15,12 +16,12 @@ if [ "${OPJ_CI_DOCKER:-}" == "true" ]; then
 
     # Forward OPJ_ specific vars
     for envvar in OPJ_CI_ARCH OPJ_CI_BUILD_CONFIGURATION OPJ_CI_BUILD_SHARED_LIBS OPJ_CI_CPACK_SYSTEM_NAME ; do
-        echo $envar=${!envar} >> dockerenv
+        echo $envvar=${!envar} >> dockerenv
     done
 
     # Forward TRAVIS env. var.
     for envvar in TRAVIS_BRANCH TRAVIS_BUILD_DIR TRAVIS_BUILD_ID TRAVIS_BUILD_NUMBER TRAVIS_COMMIT TRAVIS_COMMIT_RANGE TRAVIS_JOB_ID TRAVIS_JOB_NUMBER TRAVIS_OS_NAME TRAVIS_PULL_REQUEST TRAVIS_REPO_SLUG TRAVIS_SECURE_ENV_VARS TRAVIS_TAG ; do
-        echo $envar=${!envar} >> dockerenv
+        echo $envvar=${!envar} >> dockerenv
     done
     
     echo "The following env.var. are forwarded to docker :"
@@ -30,8 +31,6 @@ if [ "${OPJ_CI_DOCKER:-}" == "true" ]; then
     docker run --rm=true --env-file=dockerenv -v $HOME:$HOME:rw jmk/centosbuilder /bin/bash -c "cd $TRAVIS_BUILD_DIR && ./tools/travis-ci/run.sh"
     exit $?
 fi
-
-set -o nounset   ## set -u : exit the script if you try to use an uninitialised variable
 
 #if cygwin, check path
 case ${MACHTYPE} in
