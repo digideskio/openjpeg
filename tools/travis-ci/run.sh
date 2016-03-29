@@ -24,7 +24,7 @@ if [ "${OPJ_CI_DOCKER:-}" == "true" ]; then
         echo $envvar=${!envvar} >> dockerenv
     done
 
-    echo CC=/usr/bin/cc >> dockerenv
+    echo CC=/usr/bin/gcc >> dockerenv
     
     echo "The following env.var. are forwarded to docker :"
     cat dockerenv
