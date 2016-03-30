@@ -11,4 +11,9 @@ ssh-add ~/.ssh/id_rsa
 
 ssh-keyscan -H step.esa.int >> ~/.ssh/known_hosts
 
-scp  build/openjpeg-*.zip ${DEPLOY_TARGET}
+DEPLOY_DIR=${DEPLOY_TARGET}/$TRAVIS_REPO_SLUG/$TRAVIS_BUILD_NUMBER
+
+echo "https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID" > build.log
+
+scp build/openjpeg-*.zip $DEPLOY_DIR
+scp travis-build $DEPLOY_DIR
