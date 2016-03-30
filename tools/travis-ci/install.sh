@@ -63,17 +63,19 @@ if [ "${OPJ_CI_SKIP_TESTS:-}" != "1" ]; then
 
 	# We need jpylyzer for the test suite
 	echo "Retrieving jpylyzer"
-	if [ "${APPVEYOR:-}" == "True" ]; then
-		wget --local-encoding=UTF-8 -q http://dl.bintray.com/openplanets/opf-windows/jpylyzer_1.14.2_win32.zip
-		mkdir jpylyzer
-		cd jpylyzer
-		cmake -E tar -xf ../jpylyzer_1.14.2_win32.zip
-		cd ..
-	else
-		wget -qO - https://github.com/openpreserve/jpylyzer/archive/1.14.2.tar.gz | tar -xz
-		mv jpylyzer-1.14.2/jpylyzer ./
-		chmod +x jpylyzer/jpylyzer.py
-	fi
+    if [ "${OPJ_CI_JPYLYZER:-}" != "false" ]; then
+        if [ "${APPVEYOR:-}" == "True" ]; then
+            wget --local-encoding=UTF-8 -q http://dl.bintray.com/openplanets/opf-windows/jpylyzer_1.14.2_win32.zip
+            mkdir jpylyzer
+            cd jpylyzer
+            cmake -E tar -xf ../jpylyzer_1.14.2_win32.zip
+            cd ..
+        else
+            wget -qO - https://github.com/openpreserve/jpylyzer/archive/1.14.2.tar.gz | tar -xz
+            mv jpylyzer-1.14.2/jpylyzer ./
+            chmod +x jpylyzer/jpylyzer.py
+        fi
+    fi
 
 	# When OPJ_NONCOMMERCIAL=1, kakadu trial binaries are used for testing. Here's the copyright notice from kakadu:
 	# Copyright is owned by NewSouth Innovations Pty Limited, commercial arm of the UNSW Australia in Sydney.
