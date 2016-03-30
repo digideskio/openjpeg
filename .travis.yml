@@ -44,4 +44,4 @@ install:
 script:
   - ./tools/travis-ci/run.sh
 #  - ./tools/travis-ci/abi-check.sh
-#  - ./tools/travis-ci/deploy.sh
+  - ./tools/travis-ci/deploy.sh
