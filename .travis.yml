@@ -4,20 +4,22 @@ env:
   global:
     # The location where the deploy script sends artifacts. This defines the DEPLOY_TARGET env var
     - secure: "iMr7ip0QIrzJVJrQLNDXjoU+e1eKy+SSbRWWoAX5O2y0K7Nmm8hLyu8yUuHE3DiT8g0hVyCHOHkKuA1+Q1fXaT3YSpL4Zg/fsGGMObl82/wdv9jcheOA/VtsUQ1vYYv7VeRfiWPbVhm4IZme+KhKNzrHz92GzuPNraJxwf8ehmg8nZOW8eYySCnfK3LGSkg3CCNXUWOfxhQ6xU2WnYuZvr3v9BleqIrjRabghIm6xqvPpO/72liAGfOu9GV7vy6JRNVdPFbbZqmMsEgFkts/k5eirlXH+/+QujwvHOK7x/J9zMac/GhiuTbKVb8ghDs9FIyvkJU8c8AVoekqz+rqeIl37IlcanDGKNq6j8O/0hpirh/AC9cwcKpBzFShzWM3SelyV6QHP/KdRkxaAJLhp4KFOFGWkHunezzKtP5tZq6bjxfpsGizEPvUdZaXO6d1LjqoPxh1Z0QKdXESxGl+cMP/ZfzZbzFTmJ+BDrNINdOWmj4jDJCfZ249oNb6TVLrXaSD08nU4KHpNjGvBGQB5Rqj3+xi5yJWKKL2u2+7PC9JwUgTJQ31qF5qm6ceN5862EBJ4zftjjq+rRoeFPevggbPtZa0k4utp0V3FealcvQ4RkHHQXveeIZf0r/0uSmPrXzGmY4baMSz+rB2FIq+m9T7sz+S0kizHhOKB+BlxhA="
+    - OPJ_CI_BUILD_CONFIGURATION=Release
+    - OPJ_CI_BUILD_SHARED_LIBS=OFF
 
 matrix:
   include:
     - os: osx
       compiler: clang
-      env: OPJ_CI_ARCH=x86_64 OPJ_CI_BUILD_CONFIGURATION=Release OPJ_CI_BUILD_SHARED_LIBS=OFF OPJ_CI_CPACK_SYSTEM_NAME=macosx
+      env: OPJ_CI_ARCH=x86_64 OPJ_CI_CPACK_SYSTEM_NAME=macosx
     - os: linux
       compiler: gcc
-      env: OPJ_CI_ARCH=x86_64 OPJ_CI_BUILD_CONFIGURATION=Release OPJ_CI_BUILD_SHARED_LIBS=OFF OPJ_CI_CPACK_SYSTEM_NAME=linux64 OPJ_CI_DOCKER=true OPJ_CI_JPYLYZER=false
+      env: OPJ_CI_ARCH=x86_64 OPJ_CI_CPACK_SYSTEM_NAME=linux64 OPJ_CI_DOCKER=true OPJ_CI_JPYLYZER=false
       services:
         - docker
     - os: linux
       compiler: x86_64-w64-mingw32-gcc
-      env: OPJ_CI_ARCH=x86_64 OPJ_CI_BUILD_CONFIGURATION=Release OPJ_CI_BUILD_SHARED_LIBS=OFF OPJ_CI_CPACK_SYSTEM_NAME=win64
+      env: OPJ_CI_ARCH=x86_64 OPJ_CI_CPACK_SYSTEM_NAME=win64
       addons:
         apt:
           packages:
@@ -27,7 +29,7 @@ matrix:
             - gcc-mingw-w64
     - os: linux
       compiler: x86_64-w64-mingw32-gcc
-      env: OPJ_CI_ARCH=i386 OPJ_CI_BUILD_CONFIGURATION=Release OPJ_CI_BUILD_SHARED_LIBS=OFF OPJ_CI_CPACK_SYSTEM_NAME=win32
+      env: OPJ_CI_ARCH=i386 OPJ_CI_CPACK_SYSTEM_NAME=win32
       addons:
         apt:
           packages:
