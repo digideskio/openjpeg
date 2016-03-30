@@ -118,9 +118,6 @@ BUILD_THIRDPARTY:BOOL=TRUE
 # JPEG2000 test files are available with git clone https://github.com/uclouvain/openjpeg-data.git
 OPJ_DATA_ROOT:PATH=$ENV{PWD}/data
 
-# jpylyzer is available with on GitHub: https://github.com/openpreserve/jpylyzer  
-JPYLYZER_EXECUTABLE=$ENV{PWD}/jpylyzer/jpylyzer.${JPYLYZER_EXT}
-
 " )
 
 # Override CPACK_SYSTEM_NAME if provided from environment
@@ -134,6 +131,16 @@ CPACK_SYSTEM_NAME:STRING=$ENV{OPJ_CPACK_SYSTEM_NAME}
 endif()
 
 
+if (NOT "$ENV{OPJ_CI_JPYLYZER}" STREQUAL "false")
+set( CACHE_CONTENTS "
+${CACHE_CONTENTS}
+
+# jpylyzer is available with on GitHub: https://github.com/openpreserve/jpylyzer  
+JPYLYZER_EXECUTABLE=$ENV{PWD}/jpylyzer/jpylyzer.${JPYLYZER_EXT}
+
+"
+)
+endif()
 #---------------------
 #1. openjpeg specific: 
 set( CTEST_PROJECT_NAME	"OPENJPEG" )
