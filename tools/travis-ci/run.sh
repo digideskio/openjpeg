@@ -15,7 +15,7 @@ if [ "${OPJ_CI_DOCKER:-}" == "true" ]; then
     # - forward env. var. from this script to the docker daemon (except OPJ_CI_DOCKER !)
 
     # Forward OPJ_ specific vars
-    for envvar in OPJ_CI_ARCH OPJ_CI_BUILD_CONFIGURATION OPJ_CI_BUILD_SHARED_LIBS OPJ_CI_CPACK_SYSTEM_NAME ; do
+    for envvar in OPJ_CI_ARCH OPJ_CI_BUILD_CONFIGURATION OPJ_CI_BUILD_SHARED_LIBS OPJ_CI_CPACK_SYSTEM_NAME OPJ_CI_JPYLYZER ; do
         echo $envvar=${!envvar} >> dockerenv
     done
 
