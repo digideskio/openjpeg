@@ -118,6 +118,8 @@ BUILD_THIRDPARTY:BOOL=TRUE
 # JPEG2000 test files are available with git clone https://github.com/uclouvain/openjpeg-data.git
 OPJ_DATA_ROOT:PATH=$ENV{PWD}/data
 
+# Be sure executables run on MacOSX 10.6
+CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.6
 " )
 
 # Override CPACK_SYSTEM_NAME if provided from environment
@@ -148,6 +150,7 @@ JPYLYZER_EXECUTABLE=$ENV{PWD}/jpylyzer/jpylyzer.${JPYLYZER_EXT}
 "
 )
 endif()
+
 #---------------------
 #1. openjpeg specific: 
 set( CTEST_PROJECT_NAME	"OPENJPEG" )
