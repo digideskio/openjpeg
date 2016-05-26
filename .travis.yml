@@ -35,10 +35,6 @@ matrix:
             - gcc-mingw-w64-x86-64
             - gcc-mingw-w64
     - os: linux
-      compiler: clang-3.9
-      env: OPJ_CI_ARCH=x86_64 OPJ_CI_BUILD_CONFIGURATION=Release
-      sudo: true
-    - os: linux
       compiler: x86_64-w64-mingw32-gcc
       env: OPJ_CI_ARCH=x86_64 OPJ_CI_BUILD_SHARED_LIBS=ON OPJ_CI_CPACK_SYSTEM_NAME=win64
       addons:
@@ -49,7 +45,7 @@ matrix:
             - gcc-mingw-w64-x86-64
             - gcc-mingw-w64
     - os: linux
-      compiler: x86_64-w64-mingw32-gcc
+      compiler: i686-w64-mingw32-gcc
       env: OPJ_CI_ARCH=i386 OPJ_CI_BUILD_SHARED_LIBS=OFF OPJ_CI_CPACK_SYSTEM_NAME=win32
       addons:
         apt:
@@ -59,7 +55,7 @@ matrix:
             - gcc-mingw-w64-i686
             - gcc-mingw-w64
     - os: linux
-      compiler: x86_64-w64-mingw32-gcc
+      compiler: i686_64-w64-mingw32-gcc
       env: OPJ_CI_ARCH=i386 OPJ_CI_BUILD_SHARED_LIBS=ON OPJ_CI_CPACK_SYSTEM_NAME=win32
       addons:
         apt:
