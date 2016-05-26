@@ -43,6 +43,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #ifdef _WIN32
 #include "windirent.h"
@@ -150,6 +151,8 @@ typedef struct opj_decompress_params
 	int upsample;
 	/* split output components to different files */
 	int split_pnm;
+    /** number of threads */
+    int num_threads;
 }opj_decompress_parameters;
 
 /* -------------------------------------------------------------------------- */
@@ -224,8 +227,11 @@ static void decode_help_display(void) {
 	               "  -upsample\n"
 	               "    Downsampled components will be upsampled to image size\n"
 	               "  -split-pnm\n"
-	               "    Split output components to different files when writing to PNM\n"
-	               "\n");
+	               "    Split output components to different files when writing to PNM\n");
+	if( opj_has_thread_support() ) {
+	  fprintf(stdout,"  -threads <num_threads>\n"
+					"    Number of threads to use for decoding.\n");
+	}
 /* UniPG>> */
 #ifdef USE_JPWL
 	fprintf(stdout,"  -W <options>\n"
@@ -520,7 +526,8 @@ int parse_cmdline_decoder(int argc, char **argv, opj_decompress_parameters *para
 		{"OutFor",    REQ_ARG, NULL,'O'},
 		{"force-rgb", NO_ARG,  NULL, 1},
 		{"upsample",  NO_ARG,  NULL, 1},
-		{"split-pnm", NO_ARG,  NULL, 1}
+		{"split-pnm", NO_ARG,  NULL, 1},
+		{"threads",   REQ_ARG, NULL, 'T'}
 	};
 
 	const char optlist[] = "i:o:r:l:x:d:t:p:"
@@ -680,6 +687,9 @@ int parse_cmdline_decoder(int argc, char **argv, opj_decompress_parameters *para
 			case 'y':			/* Image Directory path */
                 {
 					img_fol->imgdirpath = (char*)malloc(strlen(opj_optarg) + 1);
+					if(img_fol->imgdirpath == NULL){
+						return 1;
+					}
 					strcpy(img_fol->imgdirpath,opj_optarg);
 					img_fol->set_imgdir=1;
 				}
@@ -805,6 +815,22 @@ int parse_cmdline_decoder(int argc, char **argv, opj_decompress_parameters *para
 			break;	
 #endif /* USE_JPWL */
 /* <<UniPG */            
+				
+				/* ----------------------------------------------------- */
+			case 'T':  /* Number of threads */
+				{
+					if( strcmp(opj_optarg, "ALL_CPUS") == 0 )
+					{
+						parameters->num_threads = opj_get_num_cpus();
+						if( parameters->num_threads == 1 )
+							parameters->num_threads = 0;
+					}
+					else
+					{
+					  sscanf(opj_optarg, "%d", &parameters->num_threads);
+					}
+				}
+				break;
 
 				/* ----------------------------------------------------- */
 			
@@ -882,17 +908,22 @@ OPJ_FLOAT64 opj_clock(void) {
     /* t is the high resolution performance counter (see MSDN) */
     QueryPerformanceCounter ( & t ) ;
 	return freq.QuadPart ? (t.QuadPart / (OPJ_FLOAT64)freq.QuadPart) : 0;
+#elif defined(__linux)
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	return( ts.tv_sec + ts.tv_nsec * 1e-9 );
 #else
-	/* Unix or Linux: use resource usage */
-    struct rusage t;
-    OPJ_FLOAT64 procTime;
-    /* (1) Get the rusage data structure at this moment (man getrusage) */
-    getrusage(0,&t);
-    /* (2) What is the elapsed time ? - CPU time = User time + System time */
+	/* Unix : use resource usage */
+	/* FIXME: this counts the total CPU time, instead of the user perceived time */
+	struct rusage t;
+	OPJ_FLOAT64 procTime;
+	/* (1) Get the rusage data structure at this moment (man getrusage) */
+	getrusage(0,&t);
+	/* (2) What is the elapsed time ? - CPU time = User time + System time */
 	/* (2a) Get the seconds */
-    procTime = (OPJ_FLOAT64)(t.ru_utime.tv_sec + t.ru_stime.tv_sec);
-    /* (2b) More precisely! Get the microseconds part ! */
-    return ( procTime + (OPJ_FLOAT64)(t.ru_utime.tv_usec + t.ru_stime.tv_usec) * 1e-6 ) ;
+	procTime = (OPJ_FLOAT64)(t.ru_utime.tv_sec + t.ru_stime.tv_sec);
+	/* (2b) More precisely! Get the microseconds part ! */
+	return ( procTime + (OPJ_FLOAT64)(t.ru_utime.tv_usec + t.ru_stime.tv_usec) * 1e-6 ) ;
 #endif
 }
 
@@ -1200,8 +1231,7 @@ int main(int argc, char **argv)
 
 	/* parse input and get user encoding parameters */
 	if(parse_cmdline_decoder(argc, argv, &parameters,&img_fol) == 1) {
-		destroy_parameters(&parameters);
-		return EXIT_FAILURE;
+		failed = 1; goto fin;
 	}
 
 	/* Initialize reading of directory */
@@ -1210,26 +1240,30 @@ int main(int argc, char **argv)
 		num_images=get_num_images(img_fol.imgdirpath);
 
 		dirptr=(dircnt_t*)malloc(sizeof(dircnt_t));
-		if(dirptr){
-			dirptr->filename_buf = (char*)malloc((size_t)num_images*OPJ_PATH_LEN*sizeof(char));	/* Stores at max 10 image file names*/
-			dirptr->filename = (char**) malloc((size_t)num_images*sizeof(char*));
-
-			if(!dirptr->filename_buf){
-				destroy_parameters(&parameters);
-				return EXIT_FAILURE;
-			}
-			for(it_image=0;it_image<num_images;it_image++){
-				dirptr->filename[it_image] = dirptr->filename_buf + it_image*OPJ_PATH_LEN;
-			}
-		}
-		if(load_images(dirptr,img_fol.imgdirpath)==1){
+		if(!dirptr){
 			destroy_parameters(&parameters);
 			return EXIT_FAILURE;
+		}
+		dirptr->filename_buf = (char*)malloc((size_t)num_images*OPJ_PATH_LEN*sizeof(char));	/* Stores at max 10 image file names*/
+		if(!dirptr->filename_buf){
+			failed = 1; goto fin;
+		}
+				
+		dirptr->filename = (char**) malloc((size_t)num_images*sizeof(char*));
+
+		if(!dirptr->filename){
+			failed = 1; goto fin;
+		}
+		for(it_image=0;it_image<num_images;it_image++){
+			dirptr->filename[it_image] = dirptr->filename_buf + it_image*OPJ_PATH_LEN;
+		}
+		
+		if(load_images(dirptr,img_fol.imgdirpath)==1){
+			failed = 1; goto fin;
 		}
 		if (num_images==0){
 			fprintf(stdout,"Folder is empty\n");
-			destroy_parameters(&parameters);
-			return EXIT_FAILURE;
+			failed = 1; goto fin;
 		}
 	}else{
 		num_images=1;
@@ -1254,8 +1288,7 @@ int main(int argc, char **argv)
 		l_stream = opj_stream_create_default_file_stream(parameters.infile,1);
 		if (!l_stream){
 			fprintf(stderr, "ERROR -> failed to create the stream from the file %s\n", parameters.infile);
-			destroy_parameters(&parameters);
-			return EXIT_FAILURE;
+			failed = 1; goto fin;
 		}
 
 		/* decode the JPEG2000 stream */
@@ -1297,21 +1330,25 @@ int main(int argc, char **argv)
 		/* Setup the decoder decoding parameters using user parameters */
 		if ( !opj_setup_decoder(l_codec, &(parameters.core)) ){
 			fprintf(stderr, "ERROR -> opj_decompress: failed to setup the decoder\n");
-			destroy_parameters(&parameters);
 			opj_stream_destroy(l_stream);
 			opj_destroy_codec(l_codec);
-			return EXIT_FAILURE;
+			failed = 1; goto fin;
 		}
-
+		
+		if( parameters.num_threads >= 1 && !opj_codec_set_threads(l_codec, parameters.num_threads) ) {
+			fprintf(stderr, "ERROR -> opj_decompress: failed to set number of threads\n");
+			opj_stream_destroy(l_stream);
+			opj_destroy_codec(l_codec);
+			failed = 1; goto fin;
+		}
 
 		/* Read the main header of the codestream and if necessary the JP2 boxes*/
 		if(! opj_read_header(l_stream, l_codec, &image)){
 			fprintf(stderr, "ERROR -> opj_decompress: failed to read the header\n");
-			destroy_parameters(&parameters);
 			opj_stream_destroy(l_stream);
 			opj_destroy_codec(l_codec);
 			opj_image_destroy(image);
-			return EXIT_FAILURE;
+			failed = 1; goto fin;
 		}
 
 		if (!parameters.nb_tile_to_decode) {
@@ -1319,21 +1356,19 @@ int main(int argc, char **argv)
 			if (!opj_set_decode_area(l_codec, image, (OPJ_INT32)parameters.DA_x0,
 					(OPJ_INT32)parameters.DA_y0, (OPJ_INT32)parameters.DA_x1, (OPJ_INT32)parameters.DA_y1)){
 				fprintf(stderr,	"ERROR -> opj_decompress: failed to set the decoded area\n");
-				destroy_parameters(&parameters);
 				opj_stream_destroy(l_stream);
 				opj_destroy_codec(l_codec);
 				opj_image_destroy(image);
-				return EXIT_FAILURE;
+				failed = 1; goto fin;
 			}
 
 			/* Get the decoded image */
 			if (!(opj_decode(l_codec, l_stream, image) && opj_end_decompress(l_codec,	l_stream))) {
 				fprintf(stderr,"ERROR -> opj_decompress: failed to decode image!\n");
-				destroy_parameters(&parameters);
 				opj_destroy_codec(l_codec);
 				opj_stream_destroy(l_stream);
 				opj_image_destroy(image);
-				return EXIT_FAILURE;
+				failed = 1; goto fin;
 			}
 		}
 		else {
@@ -1344,16 +1379,15 @@ int main(int argc, char **argv)
 				opj_destroy_codec(l_codec);
 				opj_stream_destroy(l_stream);
 				opj_image_destroy(image);
-				return EXIT_FAILURE;
+				failed = 1; goto fin;
 			}*/
 
 			if (!opj_get_decoded_tile(l_codec, l_stream, image, parameters.tile_index)) {
 				fprintf(stderr, "ERROR -> opj_decompress: failed to decode tile!\n");
-				destroy_parameters(&parameters);
 				opj_destroy_codec(l_codec);
 				opj_stream_destroy(l_stream);
 				opj_image_destroy(image);
-				return EXIT_FAILURE;
+				failed = 1; goto fin;
 			}
 			fprintf(stdout, "tile %d is decoded!\n\n", parameters.tile_index);
 		}
@@ -1432,9 +1466,8 @@ int main(int argc, char **argv)
 			image = upsample_image_components(image);
 			if (image == NULL) {
 				fprintf(stderr, "ERROR -> opj_decompress: failed to upsample image components!\n");
-				destroy_parameters(&parameters);
 				opj_destroy_codec(l_codec);
-				return EXIT_FAILURE;
+				failed = 1; goto fin;
 			}
 		}
 		
@@ -1456,9 +1489,8 @@ int main(int argc, char **argv)
 			}
 			if (image == NULL) {
 				fprintf(stderr, "ERROR -> opj_decompress: failed to convert to RGB image!\n");
-				destroy_parameters(&parameters);
 				opj_destroy_codec(l_codec);
-				return EXIT_FAILURE;
+				failed = 1; goto fin;
 			}
 		}
 
@@ -1567,10 +1599,17 @@ int main(int argc, char **argv)
 
 		if(failed) (void)remove(parameters.outfile); /* ignore return value */
 	}
+fin:
 	destroy_parameters(&parameters);
+	if(failed && img_fol.imgdirpath) free(img_fol.imgdirpath);
+	if(dirptr){
+		if(dirptr->filename) free(dirptr->filename);
+		if(dirptr->filename_buf) free(dirptr->filename_buf);
+		free(dirptr);
+	}
 	if (numDecompressedImages) {
 		fprintf(stdout, "decode time: %d ms\n", (int)( (tCumulative * 1000.0) / (OPJ_FLOAT64)numDecompressedImages));
 	}
 	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
-/*end main*/
+/*end main()*/
