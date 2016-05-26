@@ -55,7 +55,7 @@ matrix:
             - gcc-mingw-w64-i686
             - gcc-mingw-w64
     - os: linux
-      compiler: i686_64-w64-mingw32-gcc
+      compiler: i686-w64-mingw32-gcc
       env: OPJ_CI_ARCH=i386 OPJ_CI_BUILD_SHARED_LIBS=ON OPJ_CI_CPACK_SYSTEM_NAME=win32
       addons:
         apt:
